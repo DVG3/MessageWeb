@@ -1,13 +1,14 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-MAX_MESSAGE_LENGTH = 20
+MAX_MESSAGE_LENGTH = 30
 
 allMessages = []
-
+idx = 0
 
 class Messaging(BaseHTTPRequestHandler):
 
     def do_GET(self):
+
         if self.path == '/get_messages':
           self.send_response(200, "Created")
           self.end_headers()
@@ -28,16 +29,19 @@ class Messaging(BaseHTTPRequestHandler):
 
     def do_POST(self):
         global allMessages
+        global idx
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
         #self._set_response()
-        allMessages.append(json.loads(post_data.decode('utf-8'))['value'])
+        result = json.loads(post_data.decode('utf-8'))
+        allMessages.append(result['value'])
+
         if len(allMessages) > MAX_MESSAGE_LENGTH:
             allMessages = allMessages[len(allMessages) - MAX_MESSAGE_LENGTH + 1:]
         self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
     
         
-port = HTTPServer(('', 80), Messaging)
+port = HTTPServer(('192.168.5.242', 80), Messaging)
   
 
 port.serve_forever()

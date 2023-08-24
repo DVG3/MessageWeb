@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
     <style type="text/css">
+
+        body
+        {
+            background-color: rgb(46, 46, 46);
+            
+        }
         #chattext
         {
             width: 100%;
@@ -23,7 +28,7 @@
 
         #chatbody span
         {
-            color: red;
+            color: rgb(8, 86, 96);
             font-size: larger;
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
         }
@@ -31,8 +36,8 @@
         .message
         {
             white-space: pre-wrap;
-            background-color: gray;
-            color: black;
+            background-color: rgb(162, 161, 161);
+            color: rgb(53, 51, 51);
             border-radius: 10px;
             border-style: solid;
             margin: 10px 0 0 0;
@@ -56,10 +61,10 @@
         </button>
     </div>
 
-    <div ><br><br><br><br><br><br><br><br><br><br><br><br></div>
+    <div ><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>
 
     <script>
-        URL = "https://a3bb-14-187-234-242.ngrok-free.app"
+        URL = "http://192.168.5.242"
         document.querySelector("#name").value = "";
         document.querySelector("#chattext").value = "";
         class Message
@@ -76,18 +81,41 @@
                 this.message = this.message.replaceAll("<",'&lt;').replaceAll(">","&gt;")
                 .replaceAll("\n",'<br>')
                 console.log(this.message)
-                return `<div class="message"><span>${this.name}</span>:<br>${this.message} <br></div>`;
+                return `<div><div class="message" ><span>${this.name}</span>:<br>${this.message} <br></div><button onclick="copyText('${this.message}')">Copy</button></div>`;
             }
+
         }
+        let preMessageLength = 0;
 
+function onMessageClick()
+{
+    alert("Hello!!");
+}
 
+function copyText(text) {
+
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    document.execCommand('copy');
+  } catch (err) {
+    console.error('Unable to copy to clipboard', err);
+  }
+  document.body.removeChild(textArea);
+
+  }
         function SetMessage(message)
         {
-
-            document.querySelector("#chatbody").innerHTML = message;
+            need = message.slice(preMessageLength,message.length);
+            preMessageLength += need.length
+            document.querySelector("#chatbody").innerHTML += need;
 
         }
 
+        let curIdx = -1
 
         setInterval(()=>{
             result = fetch(URL+'/get_messages', {
@@ -121,7 +149,7 @@
             body: JSON.stringify({
                 value : new Message(
                         myname,
-                        mytext).toString()
+                        mytext).toString(),
             }),
             headers: {
                 "Content-type": "application/json; charset=UTF-8"
